@@ -15,15 +15,18 @@ public class Dungeon
         Room r5 = new Room("R5");
         Room r6 = new Room("R6");
 
-        r1.addExit("North", r2);
-        r2.addExit("South", r1);
-        r2.addExit("North", r3);
-        r3.addExit("North", r6);
-        r3.addExit("East", r5);
-        r3.addExit("South", r2);
-        r3.addExit("West", r4);
-        r4.addExit("East", r3);
-        r5.addExit("West", r3);
-        r6.addExit("South", r3);
+        r1.addExit("north", r2);
+        r2.addExit("south", r1);
+        r2.addExit("north", r3);
+        r3.addExit("north", r6);
+        r3.addExit("east", r5);
+        r3.addExit("south", r2);
+        r3.addExit("west", r4);
+        r4.addExit("east", r3);
+        r5.addExit("west", r3);
+        r6.addExit("south", r3);
+
+        //Currently only shows doors for r3, nothing else. Need to investigate
+        r1.setPlayer(Core.thePlayer);
     }
 }

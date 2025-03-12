@@ -2,17 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Exit 
+public class Exit
 {
     private string direction;
-    Room destiation;
+    private Room destination;
 
     public Exit(string direction, Room destination)
     {
         this.direction = direction;
-        this.destiation = destination; 
-
+        this.destination = destination;
     }
 
+    public string getDirection()
+    {
+        return this.direction;
+    }
 
+    public Room getDestination()
+    {
+        return this.destination;
+    }
 }
+
