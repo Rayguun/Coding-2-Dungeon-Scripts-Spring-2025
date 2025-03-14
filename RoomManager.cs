@@ -1,34 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class RoomManager : MonoBehaviour
 {
-
     public GameObject[] theDoors;
+    public GameObject mmRoomPrefab;
     private Dungeon theDungeon;
-    Room currentRoom = null;
+    private int numRoomsNorth = 1;
+    private int numRoomsxwest = 1;
+    private int numRoomsxeast = 1;
+    private int numRoomsSouth = 1;
+    private string[] beenThere = new string[6] { "", "", "", "", "", "" };
+    private int numRoomsInArray = 0;
+    private string roomToCheck;
 
-
-    // Start is called before the first frame update
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Core.thePlayer = new Player("Barbarian");
+        Core.thePlayer = new Player("Mike");
         this.theDungeon = new Dungeon();
         this.setupRoom();
-        
     }
 
-    //Turns all the doors off
+    //disable all doors
     private void resetRoom()
     {
-        for (int i = 0; i < theDoors.Length; i++)
-        {
-            theDoors[i].SetActive(false);
-        }
+        this.theDoors[0].SetActive(false);
+        this.theDoors[1].SetActive(false);
+        this.theDoors[2].SetActive(false);
+        this.theDoors[3].SetActive(false);
     }
 
-    //Shows the appropriate doors for the current room
+    //show the doors appropriate to the current room
     private void setupRoom()
     {
         Room currentRoom = Core.thePlayer.getCurrentRoom();
@@ -41,41 +44,100 @@ public class RoomManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        string direction = "";
-        if(Input.GetKeyDown(KeyCode.UpArrow))
+        bool didChangeRoom = false;
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            direction = "north";
+            //try to goto the north
+            didChangeRoom = Core.thePlayer.getCurrentRoom().tryToTakeExit("north");
+
+            roomToCheck = Core.thePlayer.getCurrentRoom().getName();
+            bool roomExists = Array.Exists(beenThere, name => name.Equals(roomToCheck, StringComparison.OrdinalIgnoreCase));
+            if (!roomExists)
+            {
+                GameObject newMMRoom = Instantiate(this.mmRoomPrefab);
+                Vector3 currPos = newMMRoom.transform.position;
+                Vector3 newPos;
+                newPos.x = currPos.x;
+                newPos.y = currPos.y;
+                newPos.z = currPos.z - 1.2f * numRoomsNorth;
+                newMMRoom.transform.position = newPos;
+                numRoomsNorth++;
+                beenThere[numRoomsInArray] = roomToCheck;
+                numRoomsInArray++;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            direction = "west";
+            //try to goto the west
+            didChangeRoom = Core.thePlayer.getCurrentRoom().tryToTakeExit("west");
+
+            roomToCheck = Core.thePlayer.getCurrentRoom().getName();
+            bool roomExists = Array.Exists(beenThere, name => name.Equals(roomToCheck, StringComparison.OrdinalIgnoreCase));
+            if (!roomExists)
+            {
+                GameObject newMMRoom = Instantiate(this.mmRoomPrefab);
+                Vector3 currPos = newMMRoom.transform.position;
+                Vector3 newPos;
+                newPos.x = currPos.x - 1.2f * numRoomsxwest;
+                newPos.y = currPos.y;
+                newPos.z = currPos.z - 1.2f * numRoomsNorth;
+                newMMRoom.transform.position = newPos;
+                numRoomsxwest++;
+                beenThere[numRoomsInArray] = roomToCheck;
+                numRoomsInArray++;
+            }
+            
+
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            direction = "east";
+            //try to goto the east
+            didChangeRoom = Core.thePlayer.getCurrentRoom().tryToTakeExit("east");
+
+            roomToCheck = Core.thePlayer.getCurrentRoom().getName();
+            bool roomExists = Array.Exists(beenThere, name => name.Equals(roomToCheck, StringComparison.OrdinalIgnoreCase));
+            if (!roomExists)
+            {
+                GameObject newMMRoom = Instantiate(this.mmRoomPrefab);
+                Vector3 currPos = newMMRoom.transform.position;
+                Vector3 newPos;
+                newPos.x = currPos.x + 1.2f * numRoomsxeast;
+                newPos.y = currPos.y;
+                newPos.z = currPos.z - 1.2f * numRoomsNorth;
+                newMMRoom.transform.position = newPos;
+                numRoomsxeast++;
+                beenThere[numRoomsInArray] = roomToCheck;
+                numRoomsInArray++;
+            }
+            
+
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            direction = "south";
-        }
-        Player thePlayer = Core.thePlayer;
-        currentRoom = thePlayer.getCurrentRoom();
-        for (int i = 0; i < currentRoom.currNumberOfExits; i++)
-        { 
-            if (thePlayer.getCurrentRoom().tryToTakeExit(direction))
+            //try to goto the south
+            didChangeRoom = Core.thePlayer.getCurrentRoom().tryToTakeExit("south");
+
+            roomToCheck = Core.thePlayer.getCurrentRoom().getName();
+            bool roomExists = Array.Exists(beenThere, name => name.Equals(roomToCheck, StringComparison.OrdinalIgnoreCase));
+            if (!roomExists)
             {
-                //Set's room to noone in there
-                currentRoom.setPlayer(null);
-                //Changes the destination
-                currentRoom = currentRoom.availableExits[i].getDestination();
-                //Puts the player in that room
-                currentRoom.setPlayer(thePlayer);
-                thePlayer.setCurrentRoom(currentRoom);
-                break;
+                GameObject newMMRoom = Instantiate(this.mmRoomPrefab);
+                Vector3 currPos = newMMRoom.transform.position;
+                Vector3 newPos;
+                newPos.x = currPos.x;
+                newPos.y = currPos.y;
+                newPos.z = currPos.z + 1.2f * numRoomsSouth;
+                newMMRoom.transform.position = newPos;
+                numRoomsSouth++;
+                beenThere[numRoomsInArray] = roomToCheck;
+                numRoomsInArray++;
             }
         }
 
+        //did we change rooms?
+        if (didChangeRoom)
+        {
+            this.setupRoom();
+        }
     }
-
-    
 }

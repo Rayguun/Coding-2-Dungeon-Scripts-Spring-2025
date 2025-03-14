@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player
 {
-    protected string name;
-    public Room currentRoom; // Stores which room the player is in. Might be usefull later
+    private string name;
+    private Room currentRoom;
 
     public Player(string name)
     {
