@@ -12,10 +12,11 @@ public class RoomManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Core.thePlayer = new Player("Mike");
         this.theDungeon = new Dungeon();
         this.setupRoom();
         this.mmCurrPos = Core.mmStartPos;
+        GameObject newMMRoom = Instantiate(this.mmRoomPrefab);
+        newMMRoom.transform.position = this.mmCurrPos;
     }
 
     //disable all doors
@@ -35,6 +36,7 @@ public class RoomManager : MonoBehaviour
         this.theDoors[1].SetActive(currentRoom.hasExit("south"));
         this.theDoors[2].SetActive(currentRoom.hasExit("east"));
         this.theDoors[3].SetActive(currentRoom.hasExit("west"));
+
     }
 
     // Update is called once per frame

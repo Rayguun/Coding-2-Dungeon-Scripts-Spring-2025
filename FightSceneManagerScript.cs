@@ -1,20 +1,25 @@
-using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class fightSceneManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public GameObject Player;
+    public GameObject Monster;
+
+    public Text PlayerHealthText;
+    public Text MonsterHealthText;
+
+    private Fight fight;
+
     void Start()
     {
-        
         Monster theMonster = new Monster("Goblin");
-        Fight f = new Fight(theMonster, Core.thePlayer);
-        f.startFight();
+        fight = new Fight(theMonster, Core.thePlayer, MonsterHealthText, PlayerHealthText);
     }
 
-    // Update is called once per frame
     void Update()
     {
-
+        fight.UpdateFight(Player, Monster);
     }
 }
+    

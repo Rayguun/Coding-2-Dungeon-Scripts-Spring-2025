@@ -1,15 +1,27 @@
+
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Fight
 {
     private Inhabitant attacker;
     private Inhabitant defender;
     private bool attackerTurn;
-    private int attackRoll;
 
-    public Fight(Monster p1, Player p2)
+    private Text playerHealthText;
+    private Text monsterHealthText;
+
+    private float attackCooldown = 1f;
+    private float timeSinceLastAttack = 0f;
+
+    public Fight(Monster p1, Player p2, Text monsterHealthText, Text playerHealthText)
     {
-        
+        this.playerHealthText = playerHealthText;
+        this.monsterHealthText = monsterHealthText;
+
+        this.playerHealthText.text = "Player Health: " + p2.getCurrentHP();
+        this.monsterHealthText.text = "Monster Health: " + p1.getCurrentHP();
+
         int roll = Random.Range(0, 20) + 1;
         if (roll <= 10)
         {
@@ -25,52 +37,82 @@ public class Fight
             defender = p1;
             attackerTurn = false;
         }
-        
-
     }
 
-    public void startFight()
+    public void UpdateFight(GameObject playerGO, GameObject monsterGO)
     {
-        while (true)
+        timeSinceLastAttack += Time.deltaTime;
+
+        if (timeSinceLastAttack >= attackCooldown)
         {
-            if (attackerTurn)
+            timeSinceLastAttack = 0f;
+            if (defender.getCurrentHP() > 0 && attacker.getCurrentHP() > 0)
             {
-                attackRoll = Random.Range(0, 20) + 1;
-                if (attackRoll >= 10)
+                if (attackerTurn)
                 {
-                    defender.takeDamage(3);
-                    if (defender.getCurrentHP() <= 0)
-                    {
-                        Debug.Log("The " + attacker.getName() + " is the winner!");
-                        break;
-                    }
-                    Debug.Log("The "+ defender.getName() +" takes 3 damage!");
+                    PerformAttack(playerGO, monsterGO);
+                    attackerTurn = false;
                 }
-                attackerTurn = false;
-            }
-            else
-            {
-                attackRoll = Random.Range(0, 20) + 1;
-                if (attackRoll >= 10)
+                else
                 {
-                    attacker.takeDamage(3);
-                    if(attacker.getCurrentHP() <= 0)
-                    {
-                        Debug.Log(defender.getName() + " is the winner!");
-                        break;
-                    }
-                    Debug.Log("The " + attacker.getName() + " takes 3 damage!");
+                    PerformAttack(playerGO, monsterGO);
+                    attackerTurn = true;
                 }
-                attackerTurn = true;
             }
         }
-        //should have the attacker and defender fight each until one of them dies.
-        //the attacker and defender should alternate between each fight round and
-        //the one who goes first was determined in the constructor.
     }
 
-    public void damage()
+    private void PerformAttack(GameObject playerGO, GameObject monsterGO)
     {
-        
+        int attackRoll = Random.Range(0, 20) + 1;
+
+        if (attackRoll >= 10)
+        {
+            defender.takeDamage(3);
+            UpdateHealthTexts();
+
+            if (defender.getCurrentHP() <= 0)
+            {
+                Debug.Log("The " + attacker.getName() + " is the winner!");
+                if (defender is Player)
+                {
+                    playerGO.SetActive(false);
+                }
+                if (defender is Monster)
+                {
+                    GameObject.Destroy(monsterGO);
+                }
+                return;
+            }
+            Debug.Log("The " + defender.getName() + " takes 3 damage!");
+        }
+        else
+        {
+            attackRoll = Random.Range(0, 20) + 1;
+            if (attackRoll >= 10)
+            {
+                attacker.takeDamage(3);
+                UpdateHealthTexts();
+                if (attacker.getCurrentHP() <= 0)
+                {
+                    Debug.Log(defender.getName() + " is the winner!");
+                    if (attacker is Player)
+                    {
+                        playerGO.SetActive(false);
+                    }
+                    if (attacker is Monster)
+                    {
+                        GameObject.Destroy(monsterGO);
+                    }
+                }
+                Debug.Log("The " + attacker.getName() + " takes 3 damage!");
+            }
+        }
+    }
+
+    private void UpdateHealthTexts()
+    {
+        playerHealthText.text = "Player Health: " + Core.thePlayer.getCurrentHP();
+        monsterHealthText.text = "Monster Health: " + attacker.getCurrentHP();
     }
 }
