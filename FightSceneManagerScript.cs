@@ -11,15 +11,28 @@ public class fightSceneManager : MonoBehaviour
 
     private Fight fight;
 
+    private Vector3 playerStartPos;
+    private Vector3 monsterStartPos;
+
+    private Vector3 attackMove = new Vector3(1, 0, 0);
+
+    private bool isPlayerTurn = true;   
+    //To get this to work, either have them be protected and fight inheirits from fightscenemanager
+    // or we just pass it through the updatefight function. 
+
+
     void Start()
     {
-        Monster theMonster = new Monster("Goblin");
+        this.playerStartPos = this.Player.transform.position;
+        this.monsterStartPos = this.Monster.transform.position;
+
+        Monster theMonster = Core.theMonster;
         fight = new Fight(theMonster, Core.thePlayer, MonsterHealthText, PlayerHealthText);
     }
 
     void Update()
     {
-        fight.UpdateFight(Player, Monster);
+        fight.updateFight(Player, Monster);
     }
 }
     
